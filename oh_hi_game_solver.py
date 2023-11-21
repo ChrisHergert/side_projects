@@ -43,7 +43,7 @@ def extract_column(board, colnum):
 		return col
 
 def compare_boards(board1, board2):
-	''' compare two boards '''
+	''' compare two boards. Return True if the two are identical, else return False '''
 	# primary length checks
 	n1 = len(board1)
 	m1 = len(board1[0])
@@ -62,10 +62,19 @@ def compare_boards(board1, board2):
 					return False
 		return True
 
+def copy_board(board):
+	''' copy an existing board. This can also be done with copy() or deepcopy(), but this is fun to do without imports'''
+	n = len(board)
+	new_board =[[' '] * n for _ in range(n)]
+	for row_indx in range(n):
+		for col_indx in range(n):
+			new_board[row_indx][col_indx] = board[row_indx][col_indx]
+	return new_board
 
 def iterate(in_board):
-	''' iterate across the board and  '''
+	''' iterate across the board and make updates '''
 	board = in_board
+	changed = 0
 	# Set up iteration
 	n = len(board)
 
@@ -77,7 +86,7 @@ def iterate(in_board):
 		for indx in range(n)[1:-1]:
 			if ro[indx-1] == 'b' and ro[indx+1] == 'b': ro[indx] = 'r'
 			if ro[indx-1] == 'r' and ro[indx+1] == 'r': ro[indx] = 'b'
-		
+
 		# check for doubles to the right
 		for indx in range(n)[:-2]:
 			if ro[indx+1] == 'b' and ro[indx+2] == 'b': ro[indx] = 'r'
@@ -94,18 +103,34 @@ def iterate(in_board):
 		for indx in range(n)[1:-1]:
 			if board[indx-1][col_indx] == 'b' and board[indx+1][col_indx] == 'b': board[indx][col_indx] = 'r'
 			if board[indx-1][col_indx] == 'r' and board[indx+1][col_indx] == 'r': board[indx][col_indx] = 'b'
+
+		# check for doubles below
+		for indx in range(n)[:-2]:
+			if board[indx+1][col_indx] == 'b' and board[indx+2][col_indx] == 'b': board[indx][col_indx] = 'r'
+			if board[indx+1][col_indx] == 'r' and board[indx+2][col_indx] == 'r': board[indx][col_indx] = 'b'
+
+		# check for doubles above
+		for indx in range(n)[2:]:
+			if board[indx-1][col_indx] == 'b' and board[indx-2][col_indx] == 'b': board[indx][col_indx] = 'r'
+			if board[indx-1][col_indx] == 'r' and board[indx-2][col_indx] == 'r': board[indx][col_indx] = 'b'
+
+	# NEXT UP: Check for any columns to complete based on numbers
+
+	
 	return board
 
 
 
 if __name__ == '__main__':
 
-	# Intro: set board size
+	# Intro: set board size and initialize variables
 	board_size = 6
+	q = 0
+	old_board = [[' '] * board_size for _ in range(board_size)]
 	board = [[' '] * board_size for _ in range(board_size)]
-	# ro = ['x','x',' ','x','o','x']
+
+	# basic 6-spot board setup
 	board[0][1] = 'b'
-	#board[0][3] = 'b' #added for troubleshooting
 	board[1][2] = 'r'
 	board[1][5] = 'r'
 	board[2][3] = 'r'
@@ -114,13 +139,16 @@ if __name__ == '__main__':
 	board[3][3] = 'r'
 	board[4][5] = 'r'
 
-	old_board=board
 
+	# Iteratively transform the board while the prior state and 
+	# the post-transformation board state don't match
+	# and while the number of transformation iterations is less than q
+	while( (compare_boards(board, old_board) == False) and q < 10):
+		old_board = copy_board(board) #set the initial board state
+		draw_board(board) #draw the initial state
+		iterate(board)	# Run an iteration
+	draw_board(board) # Print the final board state
 
-	draw_board(old_board)
-	iterate(board)
-	draw_board(old_board)
-	draw_board(board)
 
 #	for i in range(8): print(i, end='')
 #	for i in range(8)[:-2]: print(i, end='')
