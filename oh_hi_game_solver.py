@@ -115,7 +115,7 @@ def iterate(in_board):
 			if board[indx-1][col_indx] == 'r' and board[indx-2][col_indx] == 'r': board[indx][col_indx] = 'b'
 
 	# NEXT UP: Check for any columns to complete based on numbers
-
+	# NOTE: add row-/col-matching as a separate function from iterate()?
 	
 	return board
 
